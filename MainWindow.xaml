@@ -1,0 +1,358 @@
+<Window x:Class="InstaSave.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="clr-namespace:InstaSave.Models"
+        mc:Ignorable="d"
+        Title="InstaSave"
+        Icon="Assets/app.ico"
+        Width="1220"
+        Height="880"
+        MinWidth="980"
+        MinHeight="700"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="{StaticResource HeaderBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="24,18">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="42" Height="42" CornerRadius="12" Background="{StaticResource PrimaryBrush}" Margin="0,0,12,0">
+                        <TextBlock Text="IG" Foreground="White" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel>
+                        <TextBlock Text="InstaSave" FontSize="22" FontWeight="Bold" />
+                        <TextBlock Text="Instagram 사진·영상 다운로드 · v1.0.0" Foreground="{StaticResource MutedTextBrush}" FontSize="12" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <StackPanel Margin="0,0,14,0" VerticalAlignment="Center">
+                        <TextBlock Text="언어" Foreground="{StaticResource MutedTextBrush}" FontSize="11" />
+                        <ComboBox x:Name="LanguageComboBox"
+                                  Width="126"
+                                  MinHeight="34"
+                                  Padding="7,4"
+                                  SelectionChanged="LanguageComboBox_SelectionChanged">
+                            <ComboBoxItem Content="자동" Tag="auto" />
+                            <ComboBoxItem Content="한국어" Tag="ko" />
+                            <ComboBoxItem Content="English" Tag="en" />
+                        </ComboBox>
+                    </StackPanel>
+                    <StackPanel Margin="0,0,14,0" VerticalAlignment="Center">
+                        <TextBlock Text="미디어 엔진" Foreground="{StaticResource MutedTextBrush}" FontSize="11" HorizontalAlignment="Right" />
+                        <TextBlock x:Name="EngineVersionText" Text="확인 중" FontSize="12" HorizontalAlignment="Right" />
+                    </StackPanel>
+                    <Button Content="엔진 관리" Style="{StaticResource SecondaryButtonStyle}" Click="EngineManager_Click" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="24">
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="Instagram URL" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="UrlTextBox"
+                                     MinHeight="50"
+                                     AcceptsReturn="True"
+                                     TextWrapping="Wrap"
+                                     VerticalScrollBarVisibility="Auto"
+                                     ToolTip="여러 URL을 줄바꿈으로 입력할 수 있습니다. Ctrl+Enter로 목록에 추가합니다."
+                                     KeyDown="UrlTextBox_KeyDown" />
+                            <Button Grid.Column="1" Content="붙여넣기" Style="{StaticResource SecondaryButtonStyle}" Margin="10,0,0,0" Click="Paste_Click" />
+                            <Button Grid.Column="2" Content="미리보기" Style="{StaticResource SecondaryButtonStyle}" Margin="10,0,0,0" Click="Preview_Click" />
+                            <Button Grid.Column="3" Content="목록에 추가" Style="{StaticResource PrimaryButtonStyle}" Margin="10,0,0,0" Click="AddToQueue_Click" />
+                        </Grid>
+                        <TextBlock Text="릴스, 사진 게시물, 동영상 게시물, 여러 미디어가 포함된 게시물 URL을 한 줄에 하나씩 입력하세요."
+                                   Foreground="{StaticResource MutedTextBrush}" FontSize="12" Margin="0,8,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <Border x:Name="PreviewBorder" Style="{StaticResource CardStyle}" Margin="0,0,0,16" Visibility="Collapsed">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="210" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border Width="190" Height="190" Background="{StaticResource SubtleBrush}" CornerRadius="10" ClipToBounds="True" HorizontalAlignment="Left">
+                            <Image x:Name="PreviewImage" Stretch="UniformToFill" />
+                        </Border>
+                        <StackPanel Grid.Column="1" Margin="18,0,18,0">
+                            <TextBlock Text="게시물 미리보기" Foreground="{StaticResource PrimaryBrush}" FontWeight="SemiBold" FontSize="12" />
+                            <TextBlock x:Name="PreviewTitleText" Text="제목" FontSize="20" FontWeight="Bold" TextWrapping="Wrap" Margin="0,6,0,0" />
+                            <TextBlock x:Name="PreviewAuthorText" Foreground="{StaticResource MutedTextBrush}" Margin="0,6,0,0" />
+                            <WrapPanel Margin="0,14,0,0">
+                                <Border Background="{StaticResource SubtleBrush}" CornerRadius="10" Padding="9,5" Margin="0,0,7,7"><TextBlock x:Name="PreviewIdText" FontSize="12" /></Border>
+                                <Border Background="{StaticResource SubtleBrush}" CornerRadius="10" Padding="9,5" Margin="0,0,7,7"><TextBlock x:Name="PreviewDateText" FontSize="12" /></Border>
+                                <Border Background="{StaticResource SubtleBrush}" CornerRadius="10" Padding="9,5" Margin="0,0,7,7"><TextBlock x:Name="PreviewDurationText" FontSize="12" /></Border>
+                                <Border Background="{StaticResource SubtleBrush}" CornerRadius="10" Padding="9,5" Margin="0,0,7,7"><TextBlock x:Name="PreviewCountText" FontSize="12" /></Border>
+                            </WrapPanel>
+                            <TextBlock x:Name="PreviewAccessText" Foreground="{StaticResource SuccessBrush}" FontWeight="SemiBold" Margin="0,7,0,0" />
+                            <TextBlock x:Name="PreviewDescriptionText" Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" MaxHeight="54" Margin="0,9,0,0" />
+                        </StackPanel>
+                        <Button Grid.Column="2" Content="닫기" Style="{StaticResource SecondaryButtonStyle}" VerticalAlignment="Top" Click="ClosePreview_Click" />
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.8*" />
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="1.1*" />
+                            <ColumnDefinition Width="1.1*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,16,14">
+                            <TextBlock Text="저장 폴더" FontWeight="SemiBold" Margin="0,0,0,7" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="OutputFolderTextBox" IsReadOnly="True" />
+                                <Button Grid.Column="1" Content="찾아보기" Style="{StaticResource SecondaryButtonStyle}" Margin="8,0,0,0" Click="BrowseFolder_Click" />
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,16,14">
+                            <TextBlock Text="화질" FontWeight="SemiBold" Margin="0,0,0,7" />
+                            <ComboBox x:Name="QualityComboBox" SelectionChanged="Settings_Changed">
+                                <ComboBoxItem Content="최고 화질" Tag="best" />
+                                <ComboBoxItem Content="최대 1080p" Tag="1080" />
+                                <ComboBoxItem Content="최대 720p" Tag="720" />
+                                <ComboBoxItem Content="최대 480p" Tag="480" />
+                            </ComboBox>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="0" Grid.Column="3" Margin="0,0,0,14">
+                            <TextBlock Text="쿠키 사용 방식" FontWeight="SemiBold" Margin="0,0,0,7" />
+                            <ComboBox x:Name="CookieBrowserComboBox" SelectionChanged="CookieBrowser_SelectionChanged">
+                                <ComboBoxItem Content="사용 안 함" Tag="none" />
+                                <ComboBoxItem Content="브라우저 자동 감지" Tag="auto" />
+                                <ComboBoxItem Content="cookies.txt 파일 직접 선택" Tag="file" />
+                                <ComboBoxItem Content="Firefox" Tag="firefox" />
+                                <ComboBoxItem Content="Brave" Tag="brave" />
+                                <ComboBoxItem Content="Opera" Tag="opera" />
+                                <ComboBoxItem Content="Vivaldi" Tag="vivaldi" />
+                            </ComboBox>
+                            <TextBlock Text="자동 감지는 Firefox, Brave, Opera, Vivaldi 프로필을 검사하며, 사용할 수 없는 후보는 건너뜁니다." Foreground="{StaticResource MutedTextBrush}" FontSize="10" Margin="0,4,0,0" TextWrapping="Wrap" />
+                        </StackPanel>
+
+                        <Grid Grid.Row="1" Grid.Column="0" Margin="0,0,16,14">
+                            <StackPanel x:Name="CookieProfilePanel">
+                                <TextBlock Text="브라우저 프로필" FontWeight="SemiBold" Margin="0,0,0,7" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ComboBox x:Name="CookieProfileComboBox" IsEditable="True" IsTextSearchEnabled="False" SelectionChanged="Settings_Changed" LostFocus="CookieProfile_LostFocus" ToolTip="감지된 브라우저 프로필을 선택하거나 실제 프로필 경로를 직접 입력하세요." />
+                                    <Button Grid.Column="1" Content="새로고침" Style="{StaticResource SecondaryButtonStyle}" Margin="8,0,0,0" Click="RefreshCookieProfiles_Click" ToolTip="선택한 브라우저의 실제 프로필 목록을 다시 검색합니다." />
+                                </Grid>
+                                <TextBlock x:Name="CookieProfileHelpText" Text="Firefox는 실제 프로필 폴더를 자동으로 검색하며, Microsoft Store 설치 경로도 지원합니다." Foreground="{StaticResource MutedTextBrush}" FontSize="10" Margin="0,4,0,0" TextWrapping="Wrap" />
+                            </StackPanel>
+
+                            <StackPanel x:Name="CookieFilePanel" Visibility="Collapsed">
+                                <TextBlock Text="cookies.txt 파일" FontWeight="SemiBold" Margin="0,0,0,7" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="CookieFileTextBox" IsReadOnly="True" ToolTip="Netscape 형식 cookies.txt 파일 경로" />
+                                    <Button Grid.Column="1" Content="파일 선택" Style="{StaticResource SecondaryButtonStyle}" Margin="8,0,0,0" Click="BrowseCookieFile_Click" />
+                                </Grid>
+                                <TextBlock Text="Instagram 로그인 쿠키가 포함된 Netscape 형식 파일만 사용합니다." Foreground="{StaticResource MutedTextBrush}" FontSize="10" Margin="0,4,0,0" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Grid>
+
+                        <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,16,14">
+                            <TextBlock Text="파일 이름 형식" FontWeight="SemiBold" Margin="0,0,0,7" />
+                            <ComboBox x:Name="FileNameComboBox" SelectionChanged="Settings_Changed">
+                                <ComboBoxItem Content="작성자_날짜_ID" Tag="uploader-date-id" />
+                                <ComboBoxItem Content="날짜_작성자_제목_ID" Tag="date-uploader-title" />
+                                <ComboBoxItem Content="제목_ID" Tag="title-id" />
+                                <ComboBoxItem Content="날짜_제목_ID" Tag="date-title" />
+                                <ComboBoxItem Content="작성자별 폴더" Tag="uploader-folder" />
+                                <ComboBoxItem Content="게시물 ID" Tag="id" />
+                                <ComboBoxItem Content="사용자 지정" Tag="custom" />
+                            </ComboBox>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Margin="0,0,0,14">
+                            <TextBlock Text="사용자 지정 파일 이름" FontWeight="SemiBold" Margin="0,0,0,7" />
+                            <TextBox x:Name="CustomFileNameTextBox" TextChanged="CustomFileName_TextChanged" ToolTip="사용 가능: {uploader}, {date}, {id}, {title}, {resolution}, {index}" />
+                            <TextBlock Text="사용 가능: {uploader} {date} {id} {title} {resolution} {index}" Foreground="{StaticResource MutedTextBrush}" FontSize="10" Margin="0,4,0,0" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,16,14">
+                            <TextBlock Text="자동 재시도 횟수" FontWeight="SemiBold" Margin="0,0,0,7" />
+                            <ComboBox x:Name="RetryCountComboBox" SelectionChanged="Settings_Changed">
+                                <ComboBoxItem Content="1회" Tag="1" />
+                                <ComboBoxItem Content="2회" Tag="2" />
+                                <ComboBoxItem Content="3회" Tag="3" />
+                                <ComboBoxItem Content="4회" Tag="4" />
+                                <ComboBoxItem Content="5회" Tag="5" />
+                            </ComboBox>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,0,16,14">
+                            <TextBlock Text="재시도 대기 시간" FontWeight="SemiBold" Margin="0,0,0,7" />
+                            <ComboBox x:Name="RetryDelayComboBox" SelectionChanged="Settings_Changed">
+                                <ComboBoxItem Content="3초" Tag="3" />
+                                <ComboBoxItem Content="5초" Tag="5" />
+                                <ComboBoxItem Content="10초" Tag="10" />
+                                <ComboBoxItem Content="20초" Tag="20" />
+                            </ComboBox>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Grid.Column="2" Margin="0,0,16,14">
+                            <TextBlock Text="쿠키 접근 진단" FontWeight="SemiBold" Margin="0,0,0,7" />
+                            <Button x:Name="AutoDetectCookieBrowserButton" Content="브라우저 자동 감지" Style="{StaticResource SecondaryButtonStyle}" Click="AutoDetectCookieBrowser_Click" />
+                            <Button x:Name="CheckCookiesButton" Content="선택한 쿠키 검사" Style="{StaticResource SecondaryButtonStyle}" Margin="0,7,0,0" Click="CheckCookies_Click" />
+                            <Button x:Name="CloseCookieBrowserButton" Content="선택 브라우저 종료" Style="{StaticResource SecondaryButtonStyle}" Margin="0,7,0,0" Click="CloseCookieBrowser_Click" ToolTip="쿠키 DB 잠금을 해제하기 위해 선택한 브라우저의 창과 백그라운드 프로세스를 종료합니다." />
+                            <TextBlock x:Name="CookieHelpText" Text="브라우저 DB 잠금은 자동 종료 후 재시도할 수 있습니다." Foreground="{StaticResource MutedTextBrush}" FontSize="10" Margin="0,5,0,0" TextWrapping="Wrap" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Grid.Column="3" Margin="0,0,0,14">
+                            <TextBlock Text="엔진 및 FFmpeg" FontWeight="SemiBold" Margin="0,0,0,7" />
+                            <Button Content="엔진 관리 열기" Style="{StaticResource SecondaryButtonStyle}" Click="EngineManager_Click" />
+                        </StackPanel>
+
+                        <WrapPanel Grid.Row="3" Grid.ColumnSpan="4">
+                            <CheckBox x:Name="DownloadAllCheckBox" Content="게시물의 모든 미디어 다운로드" IsChecked="True" Checked="Settings_Changed" Unchecked="Settings_Changed" Margin="0,0,24,8" />
+                            <CheckBox x:Name="DownloadPhotosCheckBox" Content="사진도 다운로드" IsChecked="True" Checked="Settings_Changed" Unchecked="Settings_Changed" Margin="0,0,24,8" ToolTip="사진 전용 게시물과 사진·영상 혼합 게시물의 사진을 함께 저장합니다." />
+                            <CheckBox x:Name="SaveThumbnailCheckBox" Content="썸네일 함께 저장" Checked="Settings_Changed" Unchecked="Settings_Changed" Margin="0,0,24,8" />
+                            <CheckBox x:Name="AutoStartCheckBox" Content="URL 추가 후 자동 시작" Checked="Settings_Changed" Unchecked="Settings_Changed" Margin="0,0,24,8" />
+                            <CheckBox x:Name="ClipboardMonitorCheckBox" Content="클립보드 Instagram URL 자동 감지" Checked="Settings_Changed" Unchecked="Settings_Changed" Margin="0,0,24,8" />
+                            <CheckBox x:Name="PreventDuplicatesCheckBox" Content="중복 다운로드 방지" IsChecked="True" Checked="Settings_Changed" Unchecked="Settings_Changed" Margin="0,0,24,8" />
+                            <CheckBox x:Name="AutoRetryCheckBox" Content="실패 시 자동 재시도" IsChecked="True" Checked="Settings_Changed" Unchecked="Settings_Changed" Margin="0,0,24,8" />
+                        </WrapPanel>
+                    </Grid>
+                </Border>
+
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="다운로드 목록" FontSize="18" FontWeight="Bold" />
+                        <Border Background="{StaticResource SubtleBrush}" CornerRadius="10" Padding="8,3" Margin="10,0,0,0">
+                            <TextBlock x:Name="QueueCountText" Text="0개" Foreground="{StaticResource MutedTextBrush}" FontSize="12" />
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <Button x:Name="StartAllButton" Content="전체 시작" Style="{StaticResource PrimaryButtonStyle}" Click="StartAll_Click" Margin="0,0,8,0" />
+                        <Button Content="실패 항목 재시도" Style="{StaticResource SecondaryButtonStyle}" Click="RetryFailed_Click" Margin="0,0,8,0" />
+                        <Button Content="완료 항목 지우기" Style="{StaticResource SecondaryButtonStyle}" Click="ClearCompleted_Click" />
+                    </StackPanel>
+                </Grid>
+
+                <ItemsControl x:Name="DownloadItemsControl" ItemsSource="{Binding DownloadItems}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type models:DownloadItem}">
+                            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="92" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border Width="78" Height="78" Background="{StaticResource SubtleBrush}" CornerRadius="9" ClipToBounds="True" VerticalAlignment="Top">
+                                        <Image Source="{Binding ThumbnailUrl}" Stretch="UniformToFill" />
+                                    </Border>
+
+                                    <Grid Grid.Column="1" Margin="0,0,16,0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Text="{Binding Title}" FontSize="15" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,4,0,0">
+                                            <TextBlock Text="{Binding Author}" Foreground="{StaticResource MutedTextBrush}" FontSize="11" />
+                                            <TextBlock Text="{Binding MediaSummary, StringFormat='  · {0}'}" Foreground="{StaticResource MutedTextBrush}" FontSize="11" />
+                                        </StackPanel>
+                                        <TextBlock Grid.Row="2" Text="{Binding Url}" Foreground="{StaticResource MutedTextBrush}" FontSize="11" TextTrimming="CharacterEllipsis" Margin="0,4,0,0" />
+                                        <ProgressBar Grid.Row="3" Value="{Binding Progress}" Margin="0,13,0,0" />
+                                        <Grid Grid.Row="4" Margin="0,7,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Detail}" Foreground="{StaticResource MutedTextBrush}" FontSize="12" />
+                                                <TextBlock Text="{Binding Speed, StringFormat='  · {0}'}" Foreground="{StaticResource MutedTextBrush}" FontSize="12" />
+                                                <TextBlock Text="{Binding EtaDisplay}" Foreground="{StaticResource MutedTextBrush}" FontSize="12" />
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1" Text="{Binding Progress, StringFormat={}{0:F1}%}" Foreground="{StaticResource MutedTextBrush}" FontSize="12" />
+                                        </Grid>
+                                    </Grid>
+
+                                    <StackPanel Grid.Column="2" HorizontalAlignment="Right">
+                                        <Border Background="{StaticResource SubtleBrush}" CornerRadius="10" Padding="10,5" HorizontalAlignment="Right">
+                                            <TextBlock Text="{Binding StatusText}" Foreground="{Binding StatusBrush}" FontWeight="SemiBold" FontSize="12" />
+                                        </Border>
+                                        <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource DangerBrush}" TextWrapping="Wrap" Width="260" Margin="0,10,0,0" />
+                                        <WrapPanel HorizontalAlignment="Right" Margin="0,12,0,0">
+                                            <Button Content="시작/재시도" Style="{StaticResource SecondaryButtonStyle}" Tag="{Binding}" Click="StartItem_Click" IsEnabled="{Binding CanStart}" Margin="0,0,6,6" />
+                                            <Button Content="취소" Style="{StaticResource SecondaryButtonStyle}" Tag="{Binding}" Click="CancelItem_Click" IsEnabled="{Binding CanCancel}" Margin="0,0,6,6" />
+                                            <Button Content="폴더 열기" Style="{StaticResource SecondaryButtonStyle}" Tag="{Binding}" Click="OpenItem_Click" IsEnabled="{Binding CanOpen}" Margin="0,0,6,6" />
+                                            <Button Content="삭제" Style="{StaticResource DangerButtonStyle}" Tag="{Binding}" Click="RemoveItem_Click" Margin="0,0,0,6" />
+                                        </WrapPanel>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Border x:Name="EmptyStateBorder" Style="{StaticResource CardStyle}" Padding="30" Visibility="Visible">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="아직 다운로드 항목이 없습니다." FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                        <TextBlock Text="위에 Instagram URL을 입력하거나 클립보드 자동 감지를 켜 주세요." Foreground="{StaticResource MutedTextBrush}" Margin="0,6,0,0" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <Border Grid.Row="2" Background="{StaticResource HeaderBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Padding="24,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="StatusText" Text="준비됨" Foreground="{StaticResource MutedTextBrush}" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="1" Text="본인이 소유하거나 다운로드 권한이 있는 콘텐츠만 이용하세요." Foreground="{StaticResource MutedTextBrush}" FontSize="11" VerticalAlignment="Center" />
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

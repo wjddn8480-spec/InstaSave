@@ -1,0 +1,245 @@
+<Window x:Class="InstaSave.EngineManagerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="미디어 엔진 관리"
+        Icon="Assets/app.ico"
+        Width="760"
+        Height="720"
+        MinWidth="620"
+        MinHeight="420"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResizeWithGrip">
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      CanContentScroll="True"
+                      Padding="0,0,8,0">
+            <StackPanel>
+                <StackPanel Margin="0,0,0,16">
+                    <TextBlock Text="미디어 엔진 관리" FontSize="22" FontWeight="Bold" />
+                    <TextBlock Text="영상용 yt-dlp, 사진용 gallery-dl, FFmpeg 경로와 진단 파일을 관리합니다."
+                               Foreground="{StaticResource MutedTextBrush}"
+                               Margin="0,5,0,0"
+                               TextWrapping="Wrap" />
+                </StackPanel>
+
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,14">
+                    <StackPanel>
+                        <TextBlock Text="영상 엔진 · yt-dlp" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10" />
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="145" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Text="버전" FontWeight="SemiBold" />
+                            <TextBlock x:Name="YtDlpVersionText" Grid.Column="1" Text="확인 중" TextWrapping="Wrap" />
+
+                            <TextBlock Grid.Row="1" Text="엔진 위치" FontWeight="SemiBold" Margin="0,10,0,0" />
+                            <TextBlock x:Name="YtDlpPathText"
+                                       Grid.Row="1"
+                                       Grid.Column="1"
+                                       TextWrapping="Wrap"
+                                       Margin="0,10,0,0" />
+
+                            <TextBlock Grid.Row="2" Text="이전 버전 백업" FontWeight="SemiBold" Margin="0,10,0,0" />
+                            <TextBlock x:Name="BackupStatusText"
+                                       Grid.Row="2"
+                                       Grid.Column="1"
+                                       Margin="0,10,0,0"
+                                       TextWrapping="Wrap" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,14">
+                    <StackPanel>
+                        <TextBlock Text="사진 엔진 · gallery-dl" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10" />
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="145" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Text="버전" FontWeight="SemiBold" />
+                            <TextBlock x:Name="GalleryDlVersionText" Grid.Column="1" Text="확인 중" TextWrapping="Wrap" />
+
+                            <TextBlock Grid.Row="1" Text="엔진 위치" FontWeight="SemiBold" Margin="0,10,0,0" />
+                            <TextBlock x:Name="GalleryDlPathText"
+                                       Grid.Row="1"
+                                       Grid.Column="1"
+                                       TextWrapping="Wrap"
+                                       Margin="0,10,0,0" />
+
+                            <TextBlock Grid.Row="2" Text="이전 버전 백업" FontWeight="SemiBold" Margin="0,10,0,0" />
+                            <TextBlock x:Name="PhotoBackupStatusText"
+                                       Grid.Row="2"
+                                       Grid.Column="1"
+                                       Margin="0,10,0,0"
+                                       TextWrapping="Wrap" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- 관리 작업을 FFmpeg 영역보다 위에 두고 줄바꿈되게 배치합니다. -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,14">
+                    <StackPanel>
+                        <TextBlock Text="영상 엔진 관리" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12" />
+                        <WrapPanel>
+                            <Button x:Name="UpdateButton"
+                                    Content="영상 엔진 업데이트"
+                                    Style="{StaticResource PrimaryButtonStyle}"
+                                    MinWidth="145"
+                                    Margin="0,0,8,8"
+                                    Click="Update_Click" />
+                            <Button x:Name="ReinstallButton"
+                                    Content="영상 엔진 재설치"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    MinWidth="135"
+                                    Margin="0,0,8,8"
+                                    Click="Reinstall_Click" />
+                            <Button x:Name="RestoreButton"
+                                    Content="영상 엔진 복원"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    MinWidth="125"
+                                    Margin="0,0,8,8"
+                                    Click="Restore_Click" />
+                            <Button x:Name="ClearCacheButton"
+                                    Content="영상 캐시 초기화"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    MinWidth="135"
+                                    Margin="0,0,8,8"
+                                    Click="ClearCache_Click" />
+                        </WrapPanel>
+
+                        <TextBlock Text="사진 엔진 관리" FontSize="16" FontWeight="SemiBold" Margin="0,10,0,12" />
+                        <WrapPanel>
+                            <Button x:Name="PhotoUpdateButton"
+                                    Content="사진 엔진 업데이트"
+                                    Style="{StaticResource PrimaryButtonStyle}"
+                                    MinWidth="145"
+                                    Margin="0,0,8,8"
+                                    Click="PhotoUpdate_Click" />
+                            <Button x:Name="PhotoReinstallButton"
+                                    Content="사진 엔진 재설치"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    MinWidth="135"
+                                    Margin="0,0,8,8"
+                                    Click="PhotoReinstall_Click" />
+                            <Button x:Name="PhotoRestoreButton"
+                                    Content="사진 엔진 복원"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    MinWidth="125"
+                                    Margin="0,0,8,8"
+                                    Click="PhotoRestore_Click" />
+                            <Button x:Name="PhotoClearCacheButton"
+                                    Content="사진 캐시 초기화"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    MinWidth="135"
+                                    Margin="0,0,8,8"
+                                    Click="PhotoClearCache_Click" />
+                        </WrapPanel>
+
+                        <WrapPanel Margin="0,10,0,0">
+                            <Button Content="도구 폴더 열기"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    MinWidth="120"
+                                    Margin="0,0,8,8"
+                                    Click="OpenTools_Click" />
+                            <Button Content="로그 열기"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    MinWidth="100"
+                                    Margin="0,0,8,8"
+                                    Click="OpenLog_Click" />
+                        </WrapPanel>
+
+                        <ProgressBar x:Name="OperationProgressBar"
+                                     Minimum="0"
+                                     Maximum="100"
+                                     Visibility="Collapsed"
+                                     Margin="0,10,0,0" />
+                        <TextBlock x:Name="OperationStatusText"
+                                   Foreground="{StaticResource MutedTextBrush}"
+                                   Text="준비됨"
+                                   Margin="0,9,0,0"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,2">
+                    <StackPanel>
+                        <TextBlock Text="FFmpeg" FontSize="16" FontWeight="SemiBold" />
+                        <TextBlock x:Name="FfmpegStatusText"
+                                   Text="확인 중"
+                                   TextWrapping="Wrap"
+                                   Margin="0,8,0,0" />
+
+                        <Grid Margin="0,12,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox x:Name="FfmpegFolderTextBox"
+                                     Grid.ColumnSpan="3"
+                                     IsReadOnly="True"
+                                     TextWrapping="NoWrap" />
+
+                            <StackPanel Grid.Row="1"
+                                        Grid.ColumnSpan="3"
+                                        Orientation="Horizontal"
+                                        HorizontalAlignment="Right"
+                                        Margin="0,8,0,0">
+                                <Button Content="폴더 선택"
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Margin="0,0,8,0"
+                                        Click="BrowseFfmpeg_Click" />
+                                <Button Content="자동 검색"
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Click="ClearFfmpegPath_Click" />
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Text="ffmpeg.exe가 들어 있는 폴더를 지정하세요. 비워 두면 시스템 PATH와 앱 도구 폴더에서 자동 검색합니다."
+                                   Foreground="{StaticResource MutedTextBrush}"
+                                   FontSize="11"
+                                   Margin="0,7,0,0"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- 닫기 버튼은 본문과 분리해 작은 화면에서도 항상 표시합니다. -->
+        <Border Grid.Row="1"
+                Background="{StaticResource WindowBrush}"
+                Padding="0,12,0,0">
+            <Button Content="닫기"
+                    Style="{StaticResource SecondaryButtonStyle}"
+                    HorizontalAlignment="Right"
+                    MinWidth="90"
+                    Click="Close_Click" />
+        </Border>
+    </Grid>
+</Window>
